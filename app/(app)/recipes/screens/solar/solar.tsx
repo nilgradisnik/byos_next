@@ -36,10 +36,10 @@ export const dataSchema = z.object({
 	title: z.string().default("Solar Status"),
 	currentProduction: z.string().default("0 W"),
 	currentConsumption: z.string().default("0 W"),
-	currentNetGrid: z.string().default("0 W Import"),
+	currentNetGrid: z.string().default("0 W"),
 	lifetimeProduction: z.string().default("0 Wh"),
 	lifetimeConsumption: z.string().default("0 Wh"),
-	lifetimeNetGrid: z.string().default("0 Wh Net Import"),
+	lifetimeNetGrid: z.string().default("0 Wh"),
 	lastUpdated: z.string().default("Loading..."),
 });
 
@@ -54,6 +54,17 @@ interface SolarProps {
 	lastUpdated?: string;
 	width?: number;
 	height?: number;
+}
+
+function parseValueAndUnit(val: string) {
+	const match = val.match(/^([+-]?\d+(?:\.\d+)?)\s*(.*)$/);
+	if (match) {
+		return {
+			number: match[1],
+			unit: match[2],
+		};
+	}
+	return { number: val, unit: "" };
 }
 
 export default function Solar({
@@ -95,22 +106,42 @@ export default function Solar({
 
 	return (
 		<PreSatori width={width} height={height}>
-			<div className="flex flex-col w-full h-full bg-white text-black p-6 font-sans justify-between">
+			<div
+				className={`flex flex-col w-full h-full bg-white text-black font-sans justify-between ${
+					isHalfScreen ? "p-3" : "p-6"
+				}`}
+			>
 				{/* Top Header */}
-				<div className="flex flex-row items-center justify-between border-b-4 border-black pb-3 mb-4">
+				<div
+					className={`flex flex-row items-center justify-between border-black pb-3 mb-4 ${
+						isHalfScreen ? "border-b-2 pb-1.5 mb-2.5" : "border-b-4"
+					}`}
+				>
 					<div className="flex flex-row items-center gap-3">
 						<div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
 							<div className="w-4 h-4 rounded-full bg-white" />
 						</div>
-						<h1 className="text-3xl font-blockkie tracking-wide uppercase leading-none">
+						<h1
+							className={`font-blockkie tracking-wide uppercase leading-none ${
+								isHalfScreen ? "text-2xl" : "text-4xl"
+							}`}
+						>
 							{title}
 						</h1>
 					</div>
 					<div className="text-right flex flex-col justify-center">
-						<div className="text-xs uppercase font-geneva9 text-gray-500 tracking-wider">
+						<div
+							className={`uppercase font-geneva9 text-gray-500 tracking-wider leading-none ${
+								isHalfScreen ? "text-[8px]" : "text-xs"
+							}`}
+						>
 							System Dashboard
 						</div>
-						<div className="text-sm font-inter text-gray-700 leading-none mt-1">
+						<div
+							className={`font-inter text-gray-700 leading-none mt-1 ${
+								isHalfScreen ? "text-xs" : "text-sm"
+							}`}
+						>
 							{lastUpdated}
 						</div>
 					</div>
@@ -118,36 +149,51 @@ export default function Solar({
 
 				{/* 6 Grid items */}
 				<div
-					className={`grid gap-4 flex-1 ${isHalfScreen ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3"}`}
+					className={`grid flex-1 ${
+						isHalfScreen
+							? "grid-cols-1 gap-2"
+							: "grid-cols-2 sm:grid-cols-3 gap-4"
+					}`}
 				>
 					{stats.map((stat, idx) => (
 						<div
 							key={idx}
-							className={`border-2 border-black rounded-xl ${
-								isHalfScreen ? "p-2" : "p-4"
-							} flex flex-col justify-between ${
-								stat.customStyle || "bg-white text-black"
-							} ${stat.highlight && !stat.customStyle ? "bg-gray-100" : ""}`}
+							className={`border-2 border-black rounded-xl flex flex-col justify-between ${
+								isHalfScreen ? "py-1.5 px-3" : "p-4"
+							} ${stat.customStyle || "bg-white text-black"} ${
+								stat.highlight && !stat.customStyle ? "bg-gray-100" : ""
+							}`}
 						>
-							<div className="text-sm font-geneva9 uppercase tracking-wider opacity-80 leading-none">
-								{stat.label}
-							</div>
 							<div
-								className={`font-blockkie mt-2 leading-none truncate ${
-									isHalfScreen ? "text-xl" : "text-2xl sm:text-3xl"
+								className={`font-geneva9 uppercase tracking-wider opacity-80 leading-none ${
+									isHalfScreen ? "text-base" : "text-xl sm:text-2xl"
 								}`}
 							>
-								{stat.value}
+								{stat.label}
+							</div>
+							<div className="font-blockkie mt-1.5 leading-tight text-5xl sm:text-6xl flex flex-row items-baseline">
+								<span>{parseValueAndUnit(stat.value).number}</span>
+								{parseValueAndUnit(stat.value).unit && (
+									<span className="text-2xl sm:text-3xl ml-1.5 font-geneva9 uppercase tracking-wide">
+										{parseValueAndUnit(stat.value).unit}
+									</span>
+								)}
 							</div>
 						</div>
 					))}
 				</div>
 
 				{/* Footer Bar */}
-				<div className="w-full flex flex-row justify-between items-center text-xs text-white px-3 py-2 mt-4 rounded-lg bg-black font-geneva9">
+				<div
+					className={`w-full flex flex-row justify-between items-center text-white px-3 py-2 rounded-lg bg-black font-geneva9 ${
+						isHalfScreen ? "mt-2 text-[9px]" : "mt-4 text-xs"
+					}`}
+				>
 					<div>LOCAL ENPHASE GATEWAY INTEGRATION</div>
 					<div className="flex items-center gap-1">
-						<div className="w-2 h-2 rounded-full bg-white" />
+						<div
+							className={`rounded-full bg-white ${isHalfScreen ? "w-1.5 h-1.5" : "w-2 h-2"}`}
+						/>
 						ACTIVE
 					</div>
 				</div>

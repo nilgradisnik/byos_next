@@ -21,6 +21,7 @@ export const reactRecipeLoaders: Record<string, RecipeModuleLoader> = {
 		),
 	"simple-text": () =>
 		import("../../app/(app)/recipes/screens/simple-text/simple-text"),
+	solar: () => import("../../app/(app)/recipes/screens/solar/solar"),
 	weather: () => import("../../app/(app)/recipes/screens/weather/weather"),
 	wikipedia: () =>
 		import("../../app/(app)/recipes/screens/wikipedia/wikipedia"),
@@ -36,6 +37,7 @@ export const reactRecipeSlugs = [
 	"not-found",
 	"responsive-example",
 	"simple-text",
+	"solar",
 	"weather",
 	"wikipedia",
 ] as const;

@@ -26,10 +26,10 @@ type SolarParams = {
 function formatPower(watts: number): string {
 	const absWatts = Math.abs(watts);
 	if (absWatts >= 1000000) {
-		return `${(watts / 1000000).toFixed(2)} MW`;
+		return `${(watts / 1000000).toFixed(1)} MW`;
 	}
 	if (absWatts >= 1000) {
-		return `${(watts / 1000).toFixed(2)} kW`;
+		return `${(watts / 1000).toFixed(1)} kW`;
 	}
 	return `${watts.toFixed(0)} W`;
 }
@@ -43,7 +43,7 @@ function formatEnergy(wh: number): string {
 		return `${(wh / 1000000).toFixed(2)} MWh`;
 	}
 	if (absWh >= 1000) {
-		return `${(wh / 1000).toFixed(2)} kWh`;
+		return `${(wh / 1000).toFixed(1)} kWh`;
 	}
 	return `${wh.toFixed(0)} Wh`;
 }
@@ -109,20 +109,25 @@ async function fetchSolarData(params?: SolarParams): Promise<SolarData | null> {
 			currentConsumption: formatPower(consPower),
 			currentNetGrid:
 				gridPower < 0
-					? `${formatPower(Math.abs(gridPower))} Export`
-					: `${formatPower(gridPower)} Import`,
+					? `+${formatPower(Math.abs(gridPower))} Export`
+					: gridPower > 0
+						? `-${formatPower(gridPower)}`
+						: formatPower(gridPower),
 			lifetimeProduction: formatEnergy(lifetimeProd),
 			lifetimeConsumption: formatEnergy(lifetimeCons),
 			lifetimeNetGrid:
 				netGridLifetime < 0
-					? `${formatEnergy(Math.abs(netGridLifetime))} Net Export`
-					: `${formatEnergy(netGridLifetime)} Net Import`,
+					? `+${formatEnergy(Math.abs(netGridLifetime))} Net Export`
+					: netGridLifetime > 0
+						? `-${formatEnergy(netGridLifetime)}`
+						: formatEnergy(netGridLifetime),
 			lastUpdated: new Date().toLocaleString("en-US", {
 				month: "short",
 				day: "numeric",
 				hour: "2-digit",
 				minute: "2-digit",
 				second: "2-digit",
+				timeZone: "America/New_York",
 			}),
 		};
 	} catch (error) {
@@ -145,18 +150,19 @@ async function fetchSolarData(params?: SolarParams): Promise<SolarData | null> {
 function getMockData(title: string): SolarData {
 	return {
 		title,
-		currentProduction: "4.82 kW",
-		currentConsumption: "1.24 kW",
-		currentNetGrid: "3.58 kW Export",
+		currentProduction: "4.8 kW",
+		currentConsumption: "1.2 kW",
+		currentNetGrid: "+3.6 kW Export",
 		lifetimeProduction: "18.42 MWh",
 		lifetimeConsumption: "14.15 MWh",
-		lifetimeNetGrid: "4.27 MWh Net Export",
+		lifetimeNetGrid: "+4.27 MWh Net Export",
 		lastUpdated: new Date().toLocaleString("en-US", {
 			month: "short",
 			day: "numeric",
 			hour: "2-digit",
 			minute: "2-digit",
 			second: "2-digit",
+			timeZone: "America/New_York",
 		}),
 	};
 }
